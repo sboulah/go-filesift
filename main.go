@@ -2,71 +2,73 @@ package main
 
 import (
 	"fmt"
+	"image"
+	"io/ioutil"
 	"log"
 	"os"
+	"sboulah/go-filesift/utils"
 
-	"github.com/rwcarlsen/goexif/exif"
+	_ "golang.org/x/image/webp"
 )
 
 // Main
 func main() {
 
-	// Create a slice to store the file list
-	var fileList []string
+	// Presort Directory
+	err := os.Mkdir("./presort", 0755)
+	if err != nil {
+		fmt.Println("Directory already exists!")
+	}
 
-	// Read the directory and pass in a pointer to the slice
-	readCurrentDir(&fileList)
+	// Get Files
+	fmt.Print("Place all files into the \"presort\" direcotry! Then press enter to continue...")
+	fmt.Scanln()
 
-	// for _, i := range fileList {
-	// 	fmt.Println(i)
-	// }
+	// Check Directory
+	preDir, err := ioutil.ReadDir("./presort")
+	if err != nil {
+		log.Fatalf("Error opening directory: %s", err)
+	}
+
+	// Sorted Directory
+	err = os.Mkdir("./sorted", 0755)
+	if err != nil {
+		fmt.Println("Directory already exists!")
+	}
 
 	// Loop through files
-	for _, i := range fileList {
+	for _, i := range preDir {
 
 		// Open file
-		f, err := os.Open(fmt.Sprintf("./presort/%s", i))
-		fmt.Println(i)
-
-		// Error Checking
+		file, err := os.Open("./presort/" + i.Name())
 		if err != nil {
-			log.Fatalf("Error opening file: %s", err)
+			log.Fatalf("Error opening file: %s\n", err)
+			os.Exit(1)
 		}
 
-		// Decode file
-		x, err := exif.Decode(f)
+		defer file.Close()
 
-		// Error Checking
+		// Decode File & Get Type
+		_, fileType, err := image.Decode(file)
 		if err != nil {
-			log.Fatalf("Error decoding file: %s", err)
+			log.Fatalf("Error decoding file: %s\n", err)
+			os.Exit(1)
 		}
 
-		fileMake, _ := x.Get("Make")
+		switch fileType {
+		case "png":
+			fmt.Println("PNG")
+			utils.DecodePNG(file.Name())
+		case "jpg":
+			fmt.Println("JPG")
+			utils.DecodeJPG(file.Name())
+		case "jpeg":
+			fmt.Println("JPEG")
+			utils.DecodeJPEG(file.Name())
+		case "webp":
+			fmt.Println("WEBP")
+			utils.DecodeWEBP(file.Name())
+		}
 
-		fmt.Println(fileMake)
-	}
-
-}
-
-// Read Directory
-func readCurrentDir(fileList *[]string) {
-
-	// Open Directory
-	file, err := os.Open("./presort")
-
-	// Error Checking
-	if err != nil {
-		log.Fatalf("Failed to open directory: %s\n", err)
-	}
-
-	// Defer the closing of the directory
-	defer file.Close()
-
-	// Read all contents in the directory
-	*fileList, err = file.Readdirnames(0)
-
-	// Error Checking
-	if err != nil {
-		log.Fatalf("Error reading contents: %s", err)
 	}
 }

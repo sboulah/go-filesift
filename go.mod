@@ -1,5 +1,5 @@
-module a
+module sboulah/go-filesift
 
-go 1.17
+go 1.18
 
-require github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd
+require golang.org/x/image v0.0.0-20220601225756-64ec528b34cd
