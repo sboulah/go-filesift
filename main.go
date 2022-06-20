@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"image"
 	"io/ioutil"
 	"log"
 	"os"
@@ -38,37 +37,6 @@ func main() {
 
 	// Loop through files
 	for _, i := range preDir {
-
-		// Open file
-		file, err := os.Open("./presort/" + i.Name())
-		if err != nil {
-			log.Fatalf("Error opening file: %s\n", err)
-			os.Exit(1)
-		}
-
-		defer file.Close()
-
-		// Decode File & Get Type
-		_, fileType, err := image.Decode(file)
-		if err != nil {
-			log.Fatalf("Error decoding file: %s\n", err)
-			os.Exit(1)
-		}
-
-		switch fileType {
-		case "png":
-			fmt.Println("PNG")
-			utils.DecodePNG(file.Name())
-		case "jpg":
-			fmt.Println("JPG")
-			utils.DecodeJPG(file.Name())
-		case "jpeg":
-			fmt.Println("JPEG")
-			utils.DecodeJPEG(file.Name())
-		case "webp":
-			fmt.Println("WEBP")
-			utils.DecodeWEBP(file.Name())
-		}
-
+		utils.Detect(i)
 	}
 }

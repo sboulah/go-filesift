@@ -2,8 +2,8 @@ package utils
 
 import (
 	"fmt"
-	_ "image/jpeg"
-	_ "image/png"
+	"image/jpeg"
+	"image/png"
 	"log"
 	"os"
 
@@ -49,19 +49,14 @@ func DecodePNG(fileName string) {
 
 	// Close File
 	defer file.Close()
-}
 
-func DecodeJPG(fileName string) {
-
-	// Open File
-	file, err := os.Open(fileName)
+	// Decode File
+	data, err := png.Decode(file)
 	if err != nil {
-		log.Fatalf("Error opening JPG file: %s\n", err)
+		log.Fatalf("Error decoding PNG file: %s\n", err)
 		os.Exit(1)
 	}
-
-	// Close File
-	defer file.Close()
+	fmt.Println(data.ColorModel())
 }
 
 func DecodeJPEG(fileName string) {
@@ -75,7 +70,17 @@ func DecodeJPEG(fileName string) {
 
 	// Close File
 	defer file.Close()
+
+	// Decode File
+	data, err := jpeg.Decode(file)
+	if err != nil {
+		log.Fatalf("Error decoding JPEG file: %s\n", err)
+		os.Exit(1)
+	}
+	fmt.Println(data.ColorModel())
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func DecodeWEBM(fileName string) {
 
